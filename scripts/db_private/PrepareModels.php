@@ -24,6 +24,7 @@ class PrepareModels
 					$this->_addSetter($generated, $attribute);
 			}
 			$this->_addGeneratedToFile($contents, $generated, $file);
+			echo "Getters and setters successfully added to $file !" . PHP_EOL;
 		}
 	}
 

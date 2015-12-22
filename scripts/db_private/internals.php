@@ -35,7 +35,17 @@ function    configSet($param, $value)
 
 function	printHelp()
 {
-	die('Usage ./db.php [command]' . PHP_EOL);
+	die(
+		'Database scripts for Barebone.'                                                 . PHP_EOL
+		. 'Usage ./db.php [command]'                                                     . PHP_EOL . PHP_EOL
+		. 'Available commands :'                                                         . PHP_EOL
+		. '   create           Creates database after asking you a few things ;'         . PHP_EOL
+		. '   prepareModels    Allows itself to add getter and setters to your models ;' . PHP_EOL
+		. '   update           Updates database from your models'                        . PHP_EOL . PHP_EOL
+		. 'Available options :'                                                          . PHP_EOL
+		. '   --help           Prints this, duh ;'                                       . PHP_EOL
+		. '   --configDir      Lets you specify where are the needed config files'       . PHP_EOL
+	);
 }
 
 function	loadConfigFiles()

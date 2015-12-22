@@ -21,6 +21,7 @@ class DbCreate
 		$this->_updateConfig();
 		$this->_createDb();
 		$this->_saveConfig();
+		echo "Database successfully created !" . PHP_EOL;
 	}
 
 	private function _setupPrompter()
