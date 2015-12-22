@@ -25,7 +25,7 @@ class Tools
 
 	public static function errorAndDie(string $msg)
 	{
-		error_log($msg . PHP_EOL);
+		echo($msg . PHP_EOL);
 		die();
 	}
 }

@@ -2,19 +2,20 @@
 
 $scriptConfig = array(
 	'commands' => [
-		'create'
+		'create',
+		'prepareModels',
+		'update'
 	],
-	'configFile' => realpath(
+	'configDir' => realpath(
 		__DIR__ . DIRECTORY_SEPARATOR
 		. '..' . DIRECTORY_SEPARATOR
 		. '..' . DIRECTORY_SEPARATOR
 		. '..' . DIRECTORY_SEPARATOR
-		. 'config' . DIRECTORY_SEPARATOR
-		. 'database.json'
+		. 'config'
 	),
 	'options' => [
 		'help',
-		'configFile:'
+		'configDir:'
 	]
 );
 
@@ -37,17 +38,14 @@ function	printHelp()
 	die('Usage ./db.php [command]' . PHP_EOL);
 }
 
-function	loadConfigFile()
+function	loadConfigFiles()
 {
-	$configFile = configGet('configFile');
+	$configDir = configGet('configDir');
+	$dbConfigFile = $configDir . DIRECTORY_SEPARATOR . 'database.json';
+	$appConfigFile = $configDir . DIRECTORY_SEPARATOR . 'application.json';
 
-	if (!is_file($configFile))
-		die('Wrong config file !');
-	$dbConfig = json_decode(file_get_contents($configFile), true);
-
-	if ($dbConfig === null)
-		die("Your config file seems corrupted.");
-	configSet('dbConfig', $dbConfig);
+	loadConfigFile($dbConfigFile, 'dbConfig');
+	loadConfigFile($appConfigFile, 'appConfig');
 }
 
 function	retrieveArgs($argv)
@@ -67,6 +65,18 @@ function	retrieveArgs($argv)
 	configSet('args', $args);
 }
 
+function	loadConfigFile($configFile, $index)
+{
+	if (!is_file($configFile))
+		die('Configuration file ' . $configFile . ' not found.');
+	$asJson = json_decode(file_get_contents($configFile), true);
+
+	if ($asJson === null)
+		die('Configuration file ' . $configFile . ' is invalid.');
+	configSet($index, $asJson);
+	configSet($index . 'File', $configFile);
+}
+
 function	loadOptions($argv)
 {
 	$options = getopt('', configGet('options'));
@@ -74,8 +84,8 @@ function	loadOptions($argv)
 	if (isset($options['help']))
 		return false;
 
-	if (isset($options['configFile']))
-		configSet('configFile', $options['configFile']);
+	if (isset($options['configDir']))
+		configSet('configDir', $options['configDir']);
 }
 
 function	setupAutoload()
@@ -96,7 +106,7 @@ function	setup($argc, $argv)
 	if ($argc == 1 || loadOptions($argv) === false)
 		printHelp();
 	retrieveArgs($argv);
-	loadConfigFile();
+	loadConfigFiles();
 	setupAutoload();
 }
 

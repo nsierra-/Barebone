@@ -1,5 +1,7 @@
 <?php
 
+require_once 'Tools.php';
+
 class Application
 {
 	private	$router;
@@ -7,14 +9,16 @@ class Application
 	private	$frameworkDir;
 	private	$viewsDir;
 	private	$modelsDir;
+	private	$modelsMetadataDir;
 	private	$controlersDir;
-	private	$current;
+	private $configDir;
 
 	private $controlers = [];
 
-	public function __construct(array $config = [])
+	public function __construct($configDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config')
 	{
-		$this->current = &$this;
+		$configDir = realpath($configDir);
+		$config = $this->_retrieveConfig($configDir);
 		$this->_setDirectories($config);
 		$this->_configureAutoload();
 		$this->router = new Router($this);
@@ -40,6 +44,18 @@ class Application
 		return null;
 	}
 
+	private function _retrieveConfig($configDir)
+	{
+		$configFile = $configDir . DIRECTORY_SEPARATOR . 'application.json';
+		$config = [];
+
+		if (!is_file($configFile))
+			Tools::errorAndDie('Expected application.json at ' . $configDir . ' not found.');
+		else if (($config = json_decode(file_get_contents($configFile), true)) === null)
+			Tools::errorAndDie('An error occured loading configuration. Please make sure your config file is correct.');
+		return $config;
+	}
+
 	private function _getResponse($controlerResponse)
 	{
 		if (is_string($controlerResponse))
@@ -57,28 +73,28 @@ class Application
 
 	private function _configureAutoload()
 	{
-		$app = &$this->current;
-
 		spl_autoload_register(
-			function ($class) use (&$app)
+			function ($class)
 			{
-				if (is_file($app->frameworkDir . DIRECTORY_SEPARATOR . $class . '.php'))
-					include_once $app->frameworkDir . DIRECTORY_SEPARATOR . $class . '.php';
-				else if (is_file($app->controlersDir . DIRECTORY_SEPARATOR . $class . '.php'))
-					include_once $app->controlersDir . DIRECTORY_SEPARATOR . $class . '.php';
-				else if (is_file($app->modelsDir . DIRECTORY_SEPARATOR . $class . '.php'))
-					include_once $app->modelsDir . DIRECTORY_SEPARATOR . $class . '.php';
+				if (is_file($this->frameworkDir . DIRECTORY_SEPARATOR . $class . '.php'))
+					include_once $this->frameworkDir . DIRECTORY_SEPARATOR . $class . '.php';
+				else if (is_file($this->controlersDir . DIRECTORY_SEPARATOR . $class . '.php'))
+					include_once $this->controlersDir . DIRECTORY_SEPARATOR . $class . '.php';
+				else if (is_file($this->modelsDir . DIRECTORY_SEPARATOR . $class . '.php'))
+					include_once $this->modelsDir . DIRECTORY_SEPARATOR . $class . '.php';
 			}
 		);
 	}
 
 	private function _setDirectories(array $config = [])
 	{
-		$this->frameworkDir  = __DIR__;
-		$this->rootDir       = $config['rootDir']       ?? realpath(__DIR__ . DIRECTORY_SEPARATOR . '..');
-		$this->viewsDir      = $config['viewsDir']      ?? $this->rootDir . DIRECTORY_SEPARATOR . 'views';
-		$this->modelsDir     = $config['modelsDir']     ?? $this->rootDir . DIRECTORY_SEPARATOR . 'models';
-		$this->controlersDir = $config['controlersDir'] ?? $this->rootDir . DIRECTORY_SEPARATOR . 'controlers';
+		$this->frameworkDir      = __DIR__;
+		$this->rootDir           = $config['rootDir']           ?? realpath(__DIR__ . DIRECTORY_SEPARATOR . '..');
+		$this->viewsDir          = $config['viewsDir']          ?? $this->rootDir . DIRECTORY_SEPARATOR . 'views';
+		$this->modelsDir         = $config['modelsDir']         ?? $this->rootDir . DIRECTORY_SEPARATOR . 'models';
+		$this->modelsMetadataDir = $config['modelsMetadataDir'] ?? $this->rootDir . DIRECTORY_SEPARATOR . 'models';
+		$this->controlersDir     = $config['controlersDir']     ?? $this->rootDir . DIRECTORY_SEPARATOR . 'controlers';
+		$this->configDir         = $config['configDir']         ?? $this->rootDir . DIRECTORY_SEPARATOR . 'config';
 		$this->_resetIncludePath($config['keepOldIncludePath'] ?? true);
 	}
 

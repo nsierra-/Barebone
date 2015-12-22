@@ -68,20 +68,13 @@ class DbCreate
 	{
 		$dbConfig = configGet('dbConfig');
 
-		try
-		{
-			$dbh = new PDO($dbConfig['dsn'], $dbConfig['user'], $dbConfig['password']);
-			$dbh->query(
-				'CREATE DATABASE IF NOT EXISTS ' . $dbConfig['dbName']
-				. ' CHARACTER SET ' . $dbConfig['charset']
-			);
-			$dbh = null;
-		}
-		catch (PDOException $e)
-		{
-			error_log('PDO Error : ' . $e->getMessage());
-			die();
-		}
+		$dbh = new PDO($dbConfig['dsn'], $dbConfig['user'], $dbConfig['password']);
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$dbh->query(
+			'CREATE DATABASE IF NOT EXISTS ' . $dbConfig['dbName']
+			. ' CHARACTER SET ' . $dbConfig['charset']
+		);
+		$dbh = null;
 	}
 
 	private function _saveConfig()
@@ -89,7 +82,7 @@ class DbCreate
 		$result = $this->prompter->getResults();
 
 		if ($result['overwrite'] == 'y')
-			file_put_contents(configGet('configFile'), jsonEncodeNicely(configGet('dbConfig')));
+			file_put_contents(configGet('dbConfigFile'), jsonEncodeNicely(configGet('dbConfig')));
 	}
 
 	private function _updateConfig()

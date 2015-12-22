@@ -16,11 +16,23 @@ function launch($argc, $argv)
 		case "create":
 			$command = new DbCreate;
 			break ;
+		case "prepareModels":
+			$command = new PrepareModels;
+			break ;
+		case "update":
+			$command = new Update;
+			break ;
 		default:
-			echo 'Unknown command';
-			return ;
+			die('Unknown command' . PHP_EOL);
 	}
-	$command->run();
+	try
+	{
+		$command->run();
+	}
+	catch (PDOException $e)
+	{
+		die('An error occured ! ' . $e->getMessage());
+	}
 }
 
 launch($argc, $argv);
