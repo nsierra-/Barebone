@@ -1,5 +1,5 @@
 # Barebone
-A really simple PHP7 Framework to build web applications.
+A really simple framework to build web applications using the classic toolchain Apache >= 2.2, Mysql >= 5.5 and PHP7.
 (Work in progress).
 
 # Features
