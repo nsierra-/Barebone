@@ -7,6 +7,7 @@ A really simple framework to build web applications using the classic toolchain 
 - Templates
 - Precise Routing
 - Basic ORM (in progress)
+- Only native PHP, no external library required
 
 # Installation
 Make sure mod_rewrite is activated. ```git clone``` the repository in a folder at your website root directory. Include ```barebone_dir/Application.php``` to your website's entry point. Voilà !
